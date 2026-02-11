@@ -1,0 +1,330 @@
+/* Import Google font - Poppins */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background: rgb(238, 238, 238);
+  font-size: 0.8rem;
+}
+
+.logo {
+  width: 150px;
+  position: absolute;
+  padding-top: 20px;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.container {
+  position: relative;
+  max-width: 500px;
+  width: 100%;
+  background: #fff;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+.container header {
+  font-size: 0.8rem;
+  color: #333;
+  font-weight: 500;
+  text-align: center;
+  padding-top: 15px;
+  line-height: 1;
+}
+.container .form {
+  margin-top: 25px;
+}
+
+#prezzoManuale,
+#sezioneRating {
+  display: none;
+}
+
+.select-box {
+  position: relative;
+  height: 40px;
+  width: 100%;
+  outline: none;
+  font-size: 0.9rem;
+  color: #707070;
+  margin-top: 6px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 0 12px;
+}
+
+.duo-fields {
+  display: flex;
+  gap: 8px;
+}
+
+.duo-fields div {
+  flex: 1;
+}
+
+.form .input-box {
+  width: 100%;
+  margin-top: 10px;
+}
+.input-box label {
+  color: #333;
+  font-size: 0.8rem;
+}
+.form :where(.input-box input, .select-box) {
+  position: relative;
+  height: 40px;
+  width: 100%;
+  outline: none;
+  font-size: 0.9rem;
+  color: #707070;
+  margin-top: 6px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 0 12px;
+}
+.input-box input:focus {
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+}
+.form .column {
+  display: flex;
+  column-gap: 12px;
+}
+.form .gender-box {
+  margin-top: 15px;
+}
+.gender-box h3 {
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin-bottom: 6px;
+}
+.form :where(.gender-option, .gender) {
+  display: flex;
+  align-items: center;
+  column-gap: 40px;
+  flex-wrap: wrap;
+}
+.form .gender {
+  column-gap: 4px;
+}
+.gender input {
+  accent-color: rgb(37, 79, 126);
+}
+.form :where(.gender input, .gender label) {
+  cursor: pointer;
+}
+.gender label {
+  color: #707070;
+}
+.address :where(input, .select-box) {
+  margin-top: 12px;
+}
+.select-box select {
+  height: 100%;
+  width: 100%;
+  outline: none;
+  border: none;
+  color: #707070;
+  font-size: 0.9rem;
+}
+.form-button {
+  height: 42px;
+  padding: 0 14px;
+  background: linear-gradient(135deg, #144C97, #0E3C7C);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  margin-top: 15px;
+  width: 100%;
+  max-width: 260px;
+}
+
+.form-button:hover {
+  background: #ffffff;
+  color: #144C97;
+  border: 1px solid #144C97;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.scelta-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 30px;
+}
+
+/*Responsive*/
+@media screen and (max-width: 500px) {
+  .form .column {
+    flex-wrap: wrap;
+  }
+  .form :where(.gender-option, .gender) {
+    row-gap: 12px;
+  }
+}
+
+#myDIV {
+  height: 120px;
+  width: 100%;
+  overflow: auto;
+}
+
+/* Stile per il box scrollabile dei termini e condizioni */
+.terms-container {
+  max-height: 150px; /* Altezza massima del box */
+  overflow-y: auto; /* Abilita lo scroll verticale se il contenuto supera l'altezza massima */
+  border: 1px solid #ccc; /* Aggiungi un bordo al box */
+  border-radius: 5px; /* Arrotonda i bordi del box */
+  padding: 8px; /* Aggiungi spazio interno al box */
+  margin-top: 8px;
+}
+
+/* Stile per il testo dei termini e condizioni */
+#terms-and-conditions {
+  font-size: 12px; /* Dimensione del testo */
+  line-height: 1.4; /* Altezza della riga */
+}
+
+#nextStep {
+  background-color: rgb(37, 79, 126);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#nextStep:hover {
+  background-color: rgb(88, 56, 250);
+}
+
+::selection{
+  color: #fff;
+  background: #6990F2;
+}
+.wrapper{
+  width: 350px;
+  background: #fff;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 7px 7px 12px rgba(0,0,0,0.05);
+}
+.wrapper header{
+  color: #6990F2;
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+}
+.wrapper form{
+  height: 130px;
+  display: flex;
+  cursor: pointer;
+  margin: 30px 0;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 5px;
+  border: 2px dashed #6990F2;
+}
+form :where(i, p){
+  color: #46BFC7;
+}
+form i{
+  font-size: 40px;
+}
+form p{
+  margin-top: 8px;
+  font-size: 12px;
+  text-align: center;
+}
+
+section .row{
+  margin-bottom: 8px;
+  background: #E9F0FF;
+  list-style: none;
+  padding: 12px 16px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+section .row i{
+  color: #6990F2;
+  font-size: 24px;
+}
+section .details span{
+  font-size: 12px;
+}
+
+
+/* Stile per il checkbox e la sua etichetta */
+.styled-checkbox {
+  display: none; /* Nascondi il checkbox originale */
+}
+
+.styled-checkbox + .styled-label {
+  position: relative;
+  padding-left: 20px;
+  cursor: pointer;
+  color: #333;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.styled-checkbox + .styled-label:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.styled-checkbox:checked + .styled-label:before {
+  background: #46BFC7;
+  border-color: #46BFC7;
+}
+
+.styled-checkbox:checked + .styled-label:after {
+  content: '\f00c';
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  position: absolute;
+  left: 4px;
+  top: 2px;
+  font-size: 10px;
+  color: #fff;
+}
+
+.risultato-grande {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #144C97;
+  margin-top: 20px;
+  text-align: center;
+  background-color: #E9F0FF;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}

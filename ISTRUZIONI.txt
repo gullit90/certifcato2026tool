@@ -1,0 +1,14 @@
+TOOL-RAFFA
+
+Come usare:
+
+1. Apri il file index.html con doppio clic
+2. Seleziona il tipo di documento da generare
+3. Compila i campi
+4. Clicca sul pulsante per scaricare il PDF
+
+IMPORTANTE:
+- Non spostare i file dalle cartelle interne (img/)
+- Serve solo un browser (es. Chrome, Edge)
+
+Versione attuale: v1.0 (senza CERTIFICATO)

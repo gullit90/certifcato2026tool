@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOOL-SPENCER</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  <link rel="icon" type="image/x-icon" href="img/favicon.png">
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <div style="text-align: center;">
+        <img src="img/s&c_LOGO_BROKER.png" alt="TOOL-RAFFA Logo" style="max-height: 60px; width: auto;">
+      </div>      
+    </header>
+  
+    <div id="sceltaIniziale">
+      
+      <div class="scelta-container">
+        <h2>Seleziona l'operazione da eseguire</h2>
+        <button class="form-button" onclick="mostraForm('formDelibera')">Delibera / Carico</button>
+        <button class="form-button" onclick="mostraForm('formCaricoRC')">Carico RC</button>
+        <button class="form-button" onclick="mostraForm('formCertificato')">Certificato</button>
+        <button class="form-button" onclick="mostraForm('formPercentuale')">Calcola Percentuale Annullamento</button>
+      </div>
+    </div>
+
+    
+<!-- FORM DELIBERA + CARICO -->
+  <div id="formDelibera" style="display: none;">
+      <form id="calcoloForm" class="form">
+
+        <div class="input-box">
+          <label for="nomeSocieta">Nome Società:</label>
+          <input type="text" id="nomeSocieta" name="nomeSocieta" required>
+        </div>
+
+        <div class="input-box">
+          <label for="pivaSocieta">Partita IVA Società:</label>
+          <input type="text" id="pivaSocieta" name="pivaSocieta" required>
+        </div>
+
+        <div class="input-box duo-fields">
+          <div>
+            <label for="cap">CAP:</label>
+            <input type="text" id="cap" name="cap" required>
+          </div>
+          <div>
+            <label for="citta">Città:</label>
+            <input type="text" id="citta" name="citta" required>
+          </div>
+          <div>
+            <label for="provincia">Provincia:</label>
+            <input type="text" id="provincia" name="provincia" required>
+          </div>
+        </div>
+
+        <div class="input-box">
+          <label for="indirizzoSocieta">Indirizzo Società:</label>
+          <input type="text" id="indirizzoSocieta" name="indirizzoSocieta" required>
+        </div>
+        
+        <div class="input-box">
+          <label for="numCarico">Numero Carico:</label>
+          <input type="text" id="numCarico" name="numCarico" required>
+        </div>
+        <div class="input-box">
+          <label for="tipoPolizza">Tipologia Polizza:</label>
+          <select id="tipoPolizza" name="tipoPolizza" class="select-box" onchange="toggleModalitaCalcolo(); toggleDecorrenza();" required>
+            <option value="">-- Seleziona --</option>
+            <option value="nuovaAdesione">NUOVA ADESIONE</option>
+            <option value="Rinnovo">RINNOVO</option>
+          </select>
+        </div>
+
+        <div class="input-box">
+          <label for="decorrenza">Decorrenza:</label>
+          <input type="date" id="decorrenza" name="decorrenza" required>
+        </div>
+        <div class="input-box">
+          <label for="scadenza">Scadenza:</label>
+          <input type="date" id="scadenza" name="scadenza" required>
+        </div> 
+
+        <div class="input-box">
+          <label for="modalitaCalcolo">Modalità di Calcolo:</label>
+          <select id="modalitaCalcolo" name="modalitaCalcolo" class="select-box" onchange="toggleModalitaCalcolo()" required>
+            <option value="">-- Seleziona --</option>
+            <option value="rating">Prezzo da Rating</option>
+            <option value="manuale">Prezzo Manuale</option>
+          </select>
+        </div>
+        <div id="prezzoManuale" style="display: none;">
+          <div class="input-box">
+            <label for="fondoGaranziaManuale">Fondo di Garanzia (€):</label>
+            <input type="number" id="fondoGaranziaManuale" name="fondoGaranziaManuale" min="0" step="0.01">
+          </div>
+          <div class="input-box">
+            <label for="gestioneConsorzioManuale">Gestione Consorzio (€):</label>
+            <input type="number" id="gestioneConsorzioManuale" name="gestioneConsorzioManuale" min="0" step="0.01">
+          </div>
+          <div class="input-box">
+            <label for="iscrizioneConsorzioManuale">Iscrizione Consorzio (€):</label>
+            <input type="number" id="iscrizioneConsorzioManuale" name="iscrizioneConsorzioManuale" min="0" step="0.01">
+          </div>
+        </div>
+
+        <div id="sezioneRating" style="display: none;">
+        <div class="input-box">
+          <label for="rating">Seleziona il Rating:</label>
+          <select id="rating" name="rating" class="select-box" required>
+            <option value="">-- Seleziona --</option>
+            <option value="A">Rating A</option>
+            <option value="B">Rating B</option>
+            <option value="C">Rating C</option>
+          </select>
+        </div>
+        <div class="input-box">
+          <label for="fascia">Seleziona la Fascia di Fatturato:</label>
+          <select id="fascia" name="fascia" class="select-box" onchange="toggleFatturatoInput()" required>
+            <option value="">-- Seleziona --</option>
+            <option value="1">1) Fino a €300.000</option>
+            <option value="2">2) €300.001 - €400.000</option>
+            <option value="3">3) €400.001 - €500.000</option>
+            <option value="4">4) €500.001 - €700.000</option>
+            <option value="5">5) €700.001 - €900.000</option>
+            <option value="6">6) €900.001 - €1.000.000</option>
+            <option value="7">7) €1.000.001 - €1.500.000</option>
+            <option value="8">8) €1.500.001 - €2.250.000</option>
+            <option value="9">9) €2.250.001 - €3.000.000</option>
+            <option value="10">10) €3.000.001 - €3.500.000</option>
+            <option value="11">11) €3.500.001 - €5.000.000</option>
+            <option value="12">12) Oltre €5.000.000</option>
+          </select>
+        </div>
+        </div>
+        <div class="input-box" id="fatturatoInput" style="display: none;">
+          <label for="fatturato">Inserisci il fatturato (in €):</label>
+          <input type="number" id="fatturato" name="fatturato" min="5000000" step="1">
+        </div>
+        <button type="button" class="form-button" onclick="calcolaQuote()">Calcola</button>
+      </form>
+
+      <div id="result" class="result" style="display: none; margin-top: 20px; padding: 20px; border: 1px solid #ddd; background: #E9F0FF; border-radius: 6px;">
+        <h2>Risultato:</h2>
+        <p id="sommaQuote"></p>
+        <p id="spiegazioneCalcolo"></p>
+        <button type="button" class="form-button" onclick="scaricaDelibera()">Scarica Delibera</button>
+        <button type="button" class="form-button" onclick="scaricaCarico()">Scarica Carico</button>
+      </div>
+
+    </div>
+
+  <!-- FORM CARICO RC -->
+  <div id="formCaricoRC" style="display:none;">
+    <form id="calcoloForm" class="form">
+
+      <div class="input-box">
+        <label for="nomeSocietaRC">Nome Società:</label>
+        <input type="text" id="nomeSocietaRC" name="nomeSocietaRC" required>
+      </div>
+  
+      <div class="input-box">
+        <label for="pivaSocietaRC">Partita IVA Società:</label>
+        <input type="text" id="pivaSocietaRC" name="pivaSocietaRC" required>
+      </div>
+  
+      <div class="input-box duo-fields">
+        <div>
+          <label for="capRC">CAP:</label>
+          <input type="text" id="capRC" name="capRC" required>
+        </div>
+        <div>
+          <label for="cittaRC">Città:</label>
+          <input type="text" id="cittaRC" name="cittaRC" required>
+        </div>
+        <div>
+          <label for="provinciaRC">Provincia:</label>
+          <input type="text" id="provinciaRC" name="provinciaRC" required>
+        </div>
+      </div>
+  
+      <div class="input-box">
+        <label for="indirizzoSocietaRC">Indirizzo Società:</label>
+        <input type="text" id="indirizzoSocietaRC" name="indirizzoSocietaRC" required>
+      </div>
+      
+      <div class="input-box">
+        <label for="numCaricoRC">Numero Carico:</label>
+        <input type="text" id="numCaricoRC" name="numCaricoRC" required>
+      </div>
+  
+      <div class="input-box">
+        <label for="decorrenzaRC">Decorrenza:</label>
+        <input type="date" id="decorrenzaRC" name="decorrenzaRC" required>
+      </div>
+      <div class="input-box">
+        <label for="scadenzaRC">Scadenza:</label>
+        <input type="date" id="scadenzaRC" name="scadenzaRC" required>
+      </div> 
+  
+      <div class="input-box">
+        <label for="importoRC">Importo RC (€):</label>
+        <input type="number" id="importoRC" name="importoRC" min="0" step="0.01" required>
+      </div>
+
+      <button type="button" class="form-button" onclick="scaricaCaricoRC()">Scarica Carico RC</button>
+
+    </form>
+  
+  </div>
+
+  <!--FORM CERTIFICATO-->
+  <div id="formCertificato" style="display: none;">
+    <form id="certificatoForm" class="form">
+  
+      
+
+      <!-- PRIMA RIGA: Limitazione rimborso -->
+      <div class="input-box">
+        <label for="limitazioneRimborso">Limitazione rimborso</label>
+        <select id="limitazioneRimborso" name="limitazioneRimborso" class="select-box" onchange="toggleLimitazioneRimborso()" required>
+          <option value="">-- Seleziona --</option>
+          <option value="SI">SI</option>
+          <option value="NO">NO</option>
+        </select>
+      </div>
+
+      <!-- Importo (solo se SI) - NON viene stampato nel certificato -->
+      <div class="input-box" id="importoLimitazioneBox" style="display:none;">
+        <label for="importoLimitazioneRimborso">Importo (solo interno)</label>
+        <input type="number" id="importoLimitazioneRimborso" name="importoLimitazioneRimborso" min="0" step="0.01" placeholder="Es. 20000">
+      </div>
+<div class="input-box">
+        <label for="numeroCertificato">Numero certificato</label>
+        <input type="text" id="numeroCertificato" name="numeroCertificato" required>
+      </div>
+
+      <div class="input-box">
+        <label for="nomeSocietaCertificato">Nome Società:</label>
+        <input type="text" id="nomeSocietaCertificato" name="nomeSocietaCertificato" required>
+      </div>
+
+      <div class="input-box">
+        <label for="marchioCommercialeCertificato">Marchio Commerciale:</label>
+        <input type="text" id="marchioCommercialeCertificato" name="marchioCommercialeCertificato" required>
+      </div>
+
+      <div class="input-box">
+        <label for="pivaSocietaCertificato">Partita IVA:</label>
+        <input type="text" id="pivaSocietaCertificato" name="pivaSocietaCertificato" required>
+      </div>
+  
+      <!-- Riga 1: CAP, Città, Provincia -->
+      <div class="input-box" style="display: flex; gap: 10px;">
+        <div style="flex: 1;">
+          <label for="capLegale">CAP</label>
+          <input type="text" id="capLegale" />
+        </div>
+        <div style="flex: 2;">
+          <label for="cittaLegale">Città</label>
+          <input type="text" id="cittaLegale" />
+        </div>
+        <div style="flex: 1;">
+          <label for="provinciaLegale">Provincia</label>
+          <input type="text" id="provinciaLegale" />
+        </div>
+      </div>
+
+      <!-- Riga 2: Indirizzo, Numero -->
+      <div class="input-box" style="display: flex; gap: 10px;">
+        <div style="flex: 4;">
+          <label for="viaLegale">Indirizzo</label>
+          <input type="text" id="viaLegale" />
+        </div>
+        <div style="flex: 1;">
+          <label for="numeroLegale">N.</label>
+          <input type="text" id="numeroLegale" />
+        </div>
+      </div>
+  
+      <div class="input-box">
+        <label for="indirizzoOperativaCertificato">Sede Operativa:</label>
+        <input type="text" id="indirizzoOperativaCertificato" name="indirizzoOperativaCertificato">
+      </div>
+  
+      <div class="input-box">
+        <label for="decorrenzaCertificato">Data Decorrenza:</label>
+        <input type="date" id="decorrenzaCertificato" name="decorrenzaCertificato" required>
+      </div>
+  
+      <div class="input-box">
+        <label for="scadenzaCertificato">Data Scadenza:</label>
+        <input type="date" id="scadenzaCertificato" name="scadenzaCertificato" required>
+      </div>
+  
+      <button type="button" class="form-button" onclick="scaricaCertificato()">Scarica Certificato</button>
+  
+    </form>
+  </div>
+
+  <!-- FORM CALCOLATORE PERCENTUALE -->
+<div id="formPercentuale" style="display: none;">
+  <div class="form">
+    <h2 style="text-align: center; margin-top: 10px;">Calcolatore Percentuale Annullamento</h2>
+
+    <div class="input-box">
+      <label for="amount">Importo (€):</label>
+      <input type="number" id="amount" placeholder="Es. 1000">
+    </div>
+
+    <div class="input-box">
+      <label for="percentage">Percentuale Annullamento (%):</label>
+      <input type="number" id="percentage" placeholder="Es. 40">
+    </div>
+
+    <button class="form-button" onclick="calcolaPercentuale()">Calcola</button>
+
+    <div id="risultato" class="risultato-grande"></div>
+  </div>
+</div>
+  
+  
+
+  <button id="btnTorna" class="form-button" style="display:none;" onclick="tornaAllaScelta()">← Torna alla scelta iniziale</button>
+  </div>
+
+  
+
+  <script>
+
+function toggleLimitazioneRimborso() {
+  const scelta = document.getElementById("limitazioneRimborso")?.value;
+  const box = document.getElementById("importoLimitazioneBox");
+  const input = document.getElementById("importoLimitazioneRimborso");
+
+  if (!box || !input) return;
+
+  if (scelta === "SI") {
+    box.style.display = "block";
+    input.required = true;
+  } else {
+    box.style.display = "none";
+    input.required = false;
+    input.value = "";
+  }
+}
+
+function mostraForm(idForm) {
+  document.getElementById("sceltaIniziale").style.display = "none";
+  document.getElementById("btnTorna").style.display = "block";
+
+  const formIds = ["formDelibera", "formCaricoRC", "formCertificato", "formPercentuale"];
+  formIds.forEach(id => {
+    document.getElementById(id).style.display = (id === idForm) ? "block" : "none";
+  });
+}
+
+function tornaAllaScelta() {
+  document.getElementById("sceltaIniziale").style.display = "block";
+  document.getElementById("btnTorna").style.display = "none";
+
+  const formIds = ["formDelibera", "formCaricoRC", "formCertificato", "formPercentuale"];
+  formIds.forEach(id => {
+    document.getElementById(id).style.display = "none";
+  });
+
+  document.getElementById("result").style.display = "none"; // per delibera
+  document.getElementById("risultato").innerText = "";      // pulisce il risultato del calcolatore
+}
+
+    const quoteData = {
+      A: {
+        1: { fondoGaranzia: 190, gestioneConsorzio: 30, iscrizioneConsorzio: 50 },
+        2: { fondoGaranzia: 260, gestioneConsorzio: 45, iscrizioneConsorzio: 50 },
+        3: { fondoGaranzia: 340, gestioneConsorzio: 60, iscrizioneConsorzio: 50 },
+        4: { fondoGaranzia: 450, gestioneConsorzio: 80, iscrizioneConsorzio: 50 },
+        5: { fondoGaranzia: 565, gestioneConsorzio: 100, iscrizioneConsorzio: 50 },
+        6: { fondoGaranzia: 640, gestioneConsorzio: 115, iscrizioneConsorzio: 50 },
+        7: { fondoGaranzia: 715, gestioneConsorzio: 120, iscrizioneConsorzio: 50 },
+        8: { fondoGaranzia: 900, gestioneConsorzio: 150, iscrizioneConsorzio: 50 },
+        9: { fondoGaranzia: 1100, gestioneConsorzio: 190, iscrizioneConsorzio: 50 },
+        10: { fondoGaranzia: 1200, gestioneConsorzio: 200, iscrizioneConsorzio: 50 },
+        11: { fondoGaranzia: 1390, gestioneConsorzio: 230, iscrizioneConsorzio: 50 },
+      },
+      B: {
+        1: { fondoGaranzia: 209, gestioneConsorzio: 30, iscrizioneConsorzio: 50 },
+        2: { fondoGaranzia: 286, gestioneConsorzio: 45, iscrizioneConsorzio: 50 },
+        3: { fondoGaranzia: 374, gestioneConsorzio: 60, iscrizioneConsorzio: 50 },
+        4: { fondoGaranzia: 495, gestioneConsorzio: 80, iscrizioneConsorzio: 50 },
+        5: { fondoGaranzia: 621.50, gestioneConsorzio: 100, iscrizioneConsorzio: 50 },
+        6: { fondoGaranzia: 704, gestioneConsorzio: 115, iscrizioneConsorzio: 50 },
+        7: { fondoGaranzia: 786, gestioneConsorzio: 120, iscrizioneConsorzio: 50 },
+        8: { fondoGaranzia: 990, gestioneConsorzio: 150, iscrizioneConsorzio: 50 },
+        9: { fondoGaranzia: 1210, gestioneConsorzio: 190, iscrizioneConsorzio: 50 },
+        10: { fondoGaranzia: 1320, gestioneConsorzio: 200, iscrizioneConsorzio: 50 },
+        11: { fondoGaranzia: 1529, gestioneConsorzio: 230, iscrizioneConsorzio: 50 },
+      },
+      C: {
+        1: { fondoGaranzia: 219.45, gestioneConsorzio: 30, iscrizioneConsorzio: 50 },
+        2: { fondoGaranzia: 304.59, gestioneConsorzio: 45, iscrizioneConsorzio: 50 },
+        3: { fondoGaranzia: 389.71, gestioneConsorzio: 60, iscrizioneConsorzio: 50 },
+        4: { fondoGaranzia: 519.75, gestioneConsorzio: 80, iscrizioneConsorzio: 50 },
+        5: { fondoGaranzia: 649.47, gestioneConsorzio: 100, iscrizioneConsorzio: 50 },
+        6: { fondoGaranzia: 734.27, gestioneConsorzio: 115, iscrizioneConsorzio: 50 },
+        7: { fondoGaranzia: 829.76, gestioneConsorzio: 120, iscrizioneConsorzio: 50 },
+        8: { fondoGaranzia: 1049.40, gestioneConsorzio: 150, iscrizioneConsorzio: 50 },
+        9: { fondoGaranzia: 1259.61, gestioneConsorzio: 190, iscrizioneConsorzio: 50 },
+        10: { fondoGaranzia: 1399.20, gestioneConsorzio: 200, iscrizioneConsorzio: 50 },
+        11: { fondoGaranzia: 1619.21, gestioneConsorzio: 230, iscrizioneConsorzio: 50 },
+      },
+    };
+
+    const percentuali = {
+      A: { fondoGaranzia: 0.0008, gestioneConsorzio: 0.1, iscrizioneConsorzio: 50 },
+      B: { fondoGaranzia: 0.0015, gestioneConsorzio: 0.1, iscrizioneConsorzio: 50 },
+      C: { fondoGaranzia: 0.0023, gestioneConsorzio: 0.1, iscrizioneConsorzio: 50 },
+    };
+
+    let calcoloRisultato = {};
+
+    function toggleFatturatoInput() {
+      const fascia = document.getElementById('fascia').value;
+      const fatturatoInput = document.getElementById('fatturatoInput');
+      if (fascia === "12") {
+        fatturatoInput.style.display = 'block';
+      } else {
+        fatturatoInput.style.display = 'none';
+        document.getElementById('fatturato').value = '';
+      }
+    }
+
+    function getDataCorrente() {
+    const oggi = new Date();
+    const giorno = String(oggi.getDate()).padStart(2, '0');
+    const mese = String(oggi.getMonth() + 1).padStart(2, '0');
+    const anno = oggi.getFullYear(); // Anno completo
+    return `${giorno}.${mese}.${anno}`;
+    }
+
+    function toggleModalitaCalcolo() {
+    const modalita = document.getElementById('modalitaCalcolo').value;
+    const prezzoManualeDiv = document.getElementById('prezzoManuale');
+    const sezioneRating = document.getElementById('sezioneRating');
+
+    if (modalita === 'manuale') {
+      prezzoManualeDiv.style.display = 'block';
+      sezioneRating.style.display = 'none';
+    } else if (modalita === 'rating') {
+      prezzoManualeDiv.style.display = 'none';
+      sezioneRating.style.display = 'block';
+    } else {
+      prezzoManualeDiv.style.display = 'none';
+      sezioneRating.style.display = 'none';
+    }
+  }
+
+  function formattaNumeroItaliano(numero) {
+    numero = parseFloat(numero);  // Converte in numero (se possibile)
+    if (isNaN(numero)) return "0,00";  // Se non è un numero valido, restituisci "0,00"
+    return numero.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+function calcolaQuote() {
+    console.log("Funzione calcolaQuote() avviata"); // 👀 Debug
+    const modalita = document.getElementById('modalitaCalcolo').value;
+    console.log("Modalità selezionata:", modalita); // 👀 Debug
+    let fondoGaranzia = 0, gestioneConsorzio = 0, iscrizioneConsorzio = 0;
+
+    if (modalita === 'manuale') {
+        fondoGaranzia = parseFloat(document.getElementById('fondoGaranziaManuale').value) || 0;
+        gestioneConsorzio = parseFloat(document.getElementById('gestioneConsorzioManuale').value) || 0;
+        iscrizioneConsorzio = parseFloat(document.getElementById('iscrizioneConsorzioManuale').value) || 0;
+    } else if (modalita === 'rating') {
+        const rating = document.getElementById('rating').value;
+        const fascia = document.getElementById('fascia').value;
+        const fatturato = parseFloat(document.getElementById('fatturato').value) || 0;
+        console.log("Rating:", rating, "Fascia:", fascia, "Fatturato:", fatturato); // 👀 Debug
+
+        if (fascia === "12") {
+            const datiPercentuali = percentuali[rating];
+            fondoGaranzia = fatturato * datiPercentuali.fondoGaranzia;
+            gestioneConsorzio = fondoGaranzia * datiPercentuali.gestioneConsorzio;
+        } else {
+            const datiFascia = quoteData[rating][fascia];
+            fondoGaranzia = datiFascia.fondoGaranzia;
+            gestioneConsorzio = datiFascia.gestioneConsorzio;
+            iscrizioneConsorzio = datiFascia.iscrizioneConsorzio;
+        }
+    } else {
+        alert('Seleziona una modalità di calcolo!');
+        return;
+    }
+
+    const somma = fondoGaranzia + gestioneConsorzio + iscrizioneConsorzio;
+    console.log("Calcolo completato:", { somma, fondoGaranzia, gestioneConsorzio, iscrizioneConsorzio }); // 👀 Debug
+
+    calcoloRisultato = { somma, fondoGaranzia, gestioneConsorzio, iscrizioneConsorzio };
+
+    document.getElementById('sommaQuote').innerText = `Totale: €${formattaNumeroItaliano(somma)}`;
+    document.getElementById('spiegazioneCalcolo').innerText = `
+        Fondo di Garanzia: €${formattaNumeroItaliano(fondoGaranzia)}
+        Gestione Consorzio: €${formattaNumeroItaliano(gestioneConsorzio)}
+        Iscrizione Consorzio: €${formattaNumeroItaliano(iscrizioneConsorzio)}
+    `;
+    document.getElementById('result').style.display = 'block';
+}
+
+
+    function scaricaDelibera() {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+
+
+      const nomeSocieta = document.getElementById('nomeSocieta').value.toUpperCase();
+      const indirizzoSocieta = document.getElementById('indirizzoSocieta').value;
+      const cap = document.getElementById('cap').value;
+      const citta = document.getElementById('citta').value;
+      const pivaSocieta = document.getElementById('pivaSocieta').value;
+      const { fondoGaranzia, gestioneConsorzio, iscrizioneConsorzio, somma } = calcoloRisultato;
+      const totaleInLettere = convertiInParole(somma);
+
+      // Logo Vacanze Garantite (embedded)
+  const vgLogo = "data:image/png;base64,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";
+  const logoWidth = 90; 
+  const logoHeight = 18.56;
+  const logoX = (pdf.internal.pageSize.getWidth() - logoWidth) / 2;
+  const logoY = 10;
+  pdf.addImage(vgLogo, "PNG", logoX, logoY, logoWidth, logoHeight);
+
+      pdf.setFontSize(16);
+      pdf.setFont("Helvetica", "bold");
+      const title = "FONDO CONSORTILE DI GARANZIA";
+      const pageWidth = pdf.internal.pageSize.getWidth(); // Larghezza della pagina
+      const textWidth = pdf.getTextWidth(title); // Larghezza del testo
+      const centerX = (pageWidth - textWidth) / 2; // Calcolo della posizione centrata
+
+      pdf.text(title, centerX, 40);
+
+      pdf.setFontSize(10);
+      pdf.setFont("Helvetica", "normal");
+      pdf.text("Spettabile", 125, 55);
+      pdf.text(nomeSocieta, 125, 60);
+      pdf.text(indirizzoSocieta, 125, 65);
+      pdf.text(`${cap} ${citta}`, 125, 70);
+      pdf.text(`P IVA ${pivaSocieta}`, 125, 75);
+      
+      pdf.text(`Milano, ${getDataCorrente()}`, 10, 92);
+      pdf.setFont("Helvetica", "bold");
+      pdf.text("OGGETTO: VOSTRA RICHIESTA", 10, 106);
+
+      pdf.setFont("Helvetica", "normal");
+      pdf.text(`Spettabile ${nomeSocieta},`, 10, 120);
+      const corpoTesto = `in riferimento alla Vostra richiesta di iscrizione al Consorzio interno VACANZE GARANTITE® come Socio Consorziato, e di adesione al Fondo di garanzia consortile VACANZE GARANTITE® sulla base di quanto disposto dal DECRETO LEGISLATIVO 21 maggio 2018 , n. 62 - Attuazione della direttiva (UE) 2015/2302 del Parlamento europeo e del Consiglio, del 25 novembre 2015, relativa ai pacchetti turistici e ai servizi turistici collegati, che modifica il regolamento (CE) n. 2006/2004 e la direttiva 2011/83/UE del Parlamento europeo e del Consiglio e che abroga la direttiva 90/314/CEE del Consiglio. – Sezione V – Protezione in caso di insolvenza o fallimento - Art. 47 comma 3, Vi comunichiamo che la Vostra domanda è stata accettata.`;
+      pdf.text(corpoTesto, 10, 127, { maxWidth: 190, align: "justify"});
+
+      pdf.setFont("Helvetica", "normal");
+      pdf.text("In base ai dati da Voi forniti e trasmessi mediante il modulo di adesione, le quote annuali da corrispondere sono le seguenti:", 10, 160, { maxWidth: 190, align: "justify"});
+
+      pdf.setFont("Helvetica", "normal");
+
+// Definizione delle colonne
+const col1X = 10;   // Posizione della descrizione
+const col2X = 140;  // Posizione "Euro"
+const col3X = 160;  // Posizione importo
+
+// Dati delle quote
+const quote = [
+  ["Quota annuale di iscrizione al consorzio", formattaNumeroItaliano(iscrizioneConsorzio)],
+  ["Quota annuale del Fondo di Garanzia", 	formattaNumeroItaliano(fondoGaranzia)],
+  ["Quota annuale di Gestione (IVA compresa)", `${formattaNumeroItaliano(gestioneConsorzio)}`]
+];
+
+// Stampa le quote con allineamento
+let startY = 173;
+quote.forEach(([descrizione, importo]) => {
+  pdf.text(descrizione, col1X, startY);
+  pdf.text("Euro", col2X, startY);
+  // Determina la posizione per allineare a destra
+const col3Width = 25; // Larghezza riservata ai prezzi
+const prezzoX = col3X + col3Width - pdf.getTextWidth(importo);
+
+pdf.text(importo, prezzoX, startY);
+  startY += 5;  // Spaziatura tra le righe
+});
+
+      pdf.setFont("Helvetica", "normal");
+      pdf.text("Tutte le quote indicate sono obbligatorie e il mancato pagamento di anche una sola quota, non permetterà il rilascio del Certificato di garanzia del Fondo consortile VACANZE GARANTITE®", 10, 192, { maxWidth: 190, align: "justify" });
+      
+      pdf.text(`Al fine dell’iscrizione al consorzio e del rilascio del certificato di garanzia del Fondo consortile VACANZE GARANTITE® il versamento della somma complessiva di Euro ${formattaNumeroItaliano(somma)} (${totaleInLettere}) deve essere effettuato entro 5 (cinque) giorni dal ricevimento della presente mediante bonifico bancario alle coordinate bancarie a Voi indicate.`, 10, 202, { maxWidth: 190, align: "justify"  });
+
+      pdf.setFont("Helvetica", "normal");
+      pdf.text("Vi ringraziamo per la preferenza accordataci e Vi diamo il benvenuto nel Consorzio.", 10, 220);
+      pdf.text("Cordiali saluti,", 10, 230);
+      pdf.text("Consorzio VACANZE GARANTITE®", 110, 240);
+
+      pdf.setFontSize(8);
+      pdf.setFont("Helvetica", "normal");
+      const footerLines = [
+  "Consorzio Vacanze Garantite",
+  "Via Enrico Cosenz 54/B – 20158 Milano - P.Iva 11619990960",
+  "info@vacanzegarantite.it - www.vacanzegarantite.it"
+];
+
+const footerPageWidth = pdf.internal.pageSize.getWidth(); // Larghezza della pagina
+const footerY = pdf.internal.pageSize.getHeight() - 20; // Posizione verticale per il footer
+
+// Colore grigio per le prime due righe
+pdf.setTextColor("#808080"); 
+footerLines.slice(0, 2).forEach((line, index) => {
+  const lineWidth = pdf.getTextWidth(line); // Calcola la larghezza di ogni riga
+  const lineCenterX = (footerPageWidth - lineWidth) / 2; // Posizione orizzontale centrata
+  pdf.text(line, lineCenterX, footerY + index * 5); // Ogni riga separata da 5 unità verticalmente
+});
+
+// Colore nero per l'ultima riga e aggiunta di link
+pdf.setTextColor("#0000FF"); 
+const lastLine = footerLines[2];
+const lastLineWidth = pdf.getTextWidth(lastLine);
+const lastLineCenterX = (footerPageWidth - lastLineWidth) / 2;
+const lastLineY = footerY + 2 * 5; // Posizione della terza riga
+
+pdf.text(lastLine, lastLineCenterX, lastLineY);
+
+// Aggiunta di link per "info@vacanzegarantite.it" e "www.vacanzegarantite.it"
+const emailLink = "info@vacanzegarantite.it";
+const webLink = "www.vacanzegarantite.it";
+
+const emailWidth = pdf.getTextWidth(emailLink); // Larghezza del testo del link email
+const emailX = lastLineCenterX; // Posizione X dell'email (centrata con il resto del testo)
+const webX = lastLineCenterX + emailWidth + pdf.getTextWidth(" - "); // Posizione X del sito web
+
+pdf.link(emailX, lastLineY - 2, emailWidth, 5, { url: `mailto:${emailLink}` });
+pdf.link(webX, lastLineY - 2, pdf.getTextWidth(webLink), 5, { url: `https://${webLink}` });
+
+
+      // Generazione del nome del file
+      const dataCorrente = getDataCorrente(); // Data nel formato DD.MM.YYYY
+      const nomeFile = `Lettera Delibera ${nomeSocieta} ${dataCorrente.replace(/\./g, "-")}.pdf`;
+
+      pdf.save(nomeFile);
+    }
+
+    function scaricaCarico() {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p", "mm", "a4");
+
+  // Recupera i dati dal form
+  const nomeSocieta = document.getElementById('nomeSocieta').value.toUpperCase();
+  const indirizzoSocieta = document.getElementById('indirizzoSocieta').value;
+  const cap = document.getElementById('cap').value;
+  const citta = document.getElementById('citta').value;
+  const provincia = document.getElementById('provincia').value;
+  const pivaSocieta = document.getElementById('pivaSocieta').value;
+  const numCarico = document.getElementById('numCarico').value;
+  const decorrenza = formattaDataItaliana(document.getElementById('decorrenza').value);
+  const scadenza = formattaDataItaliana(document.getElementById('scadenza').value);
+  const tipoPolizza = document.getElementById('tipoPolizza').value;
+  const somma = calcoloRisultato.somma.toFixed(2);
+  
+  function getDataCorrente() {
+    const oggi = new Date();
+    const giorno = String(oggi.getDate()).padStart(2, '0');
+    const mese = String(oggi.getMonth() + 1).padStart(2, '0');
+    const anno = oggi.getFullYear(); // Anno completo
+    return `${giorno}.${mese}.${anno}`;
+}
+
+// 📌 INSERISCI QUI LA FUNZIONE formattaDataItaliana()
+function formattaDataItaliana(dataInput) {
+  if (!dataInput) return "";
+  const tipoPolizza = document.getElementById('tipoPolizza').value;
+
+  const parts = dataInput.split('-');
+  if (parts.length === 3) {
+    // Formato YYYY-MM-DD
+    return `${parts[2]}.${parts[1]}.${parts[0]}`;
+  } else if (parts.length === 2 && tipoPolizza === "nuovaAdesione") {
+    // Formato YYYY-MM per nuova adesione
+    return `${parts[1]}.${parts[0]}`;
+  }
+
+  return dataInput;
+}
+
+
+
+
+
+  // Funzione per ottenere l'orario corrente
+  function getOraCorrente() {
+    const ora = new Date();
+    return `${String(ora.getHours()).padStart(2, '0')}:${String(ora.getMinutes()).padStart(2, '0')}`;
+  }
+
+  // Funzione per convertire le date di input nel formato DD/MM/YY
+  function formattaData(dataInput) {
+    if (!dataInput) return "";
+    const parts = dataInput.split('-'); // Supponendo che l'input sia in formato YYYY-MM-DD
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0].slice(-2)}`;
+    }
+    return dataInput; // Se il formato è già corretto, restituisce invariato
+  }
+
+  // Imposta font e dimensioni
+  pdf.setFont("Helvetica", "normal");
+  pdf.setFontSize(9);
+
+  // Aggiungi logo mantenendo proporzioni
+  const logoPath = "img/s&c_LOGO_BROKER.png";
+  const originalWidth = 7250; // Larghezza originale del logo
+  const originalHeight = 1366; // Altezza originale del logo
+  const scaleFactor = 0.01; // Fattore di scala per adattare al PDF
+  const logoWidth = originalWidth * scaleFactor; // Larghezza ridimensionata
+  const logoHeight = originalHeight * scaleFactor; // Altezza ridimensionata
+
+  // Calcola posizione centrata per il logo
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const logoX = (pageWidth - logoWidth) / 2; // Centrare orizzontalmente
+  const logoY = 10; // Posizione dall'alto
+  pdf.addImage(logoPath, "PNG", logoX, logoY, logoWidth, logoHeight);
+
+  // Testo intestazione
+  pdf.text(`Milano ${getDataCorrente()}`, 10, 40);
+  pdf.text(`time: ${getOraCorrente()}`, 190, 40, null, null, "right");
+
+  // Striscia grigia sotto il titolo
+pdf.setFillColor("#D9D9D9");
+pdf.rect(10, 46, 190, 5, "F");  // Rettangolo pieno (disegnato prima)
+
+// Titolo Carico Contabile sopra la striscia
+pdf.setFont("Helvetica", "bold");
+pdf.setTextColor(0, 0, 0);  // Testo nero
+pdf.text("CARICO CONTABILE N.", 10, 50);
+pdf.setFont("Helvetica", "bold");
+const dataOggi = new Date();
+const annoShort = dataOggi.getFullYear();
+const meseShort = String(dataOggi.getMonth() + 1).padStart(2, '0'); // Mese con due cifre
+
+const numeroFormatoPDF = `${annoShort} ${meseShort}-00100-10${numCarico}`;
+
+pdf.text(numeroFormatoPDF, 90, 50);
+
+pdf.text(numCarico, 180, 50, null, null, "right");
+
+
+  // Dati contraente
+  pdf.setFont("Helvetica", "normal");
+  pdf.text("CONTRAENTE", 10, 60);
+  pdf.text(nomeSocieta, 90, 60);
+  pdf.text("INDIRIZZO", 10, 68);
+  pdf.text(indirizzoSocieta, 90, 68);
+  pdf.text("C.A.P./CITTA'", 10, 76);
+  pdf.text(`${cap} ${citta}`, 90, 76);
+  pdf.text("PROVINCIA/NAZIONE", 10, 84);
+  pdf.text(provincia, 90, 84);
+  pdf.text("C.F./P. IVA", 10, 92);
+  pdf.text(pivaSocieta, 90, 92);
+  pdf.text("RISCHIO", 10, 100);
+  pdf.text("INSOLVENZA/FALLIMENTO", 90, 100);
+  pdf.text("COD./FRAZIONAMENTO", 10, 108);
+  pdf.text("01/ANNUALE", 90, 108);
+  pdf.text("EMITTENTE", 10, 116);
+  pdf.text("FONDO CONSORTILE DI GARANZIA VACANZE GARANTITE", 90, 116);
+  pdf.text("DIPENDENZA", 10, 124);
+  pdf.text("MILANO", 90, 124);
+  pdf.text("POLIZZA", 10, 132);
+  pdf.text(tipoPolizza.replace(/([a-z])([A-Z])/g, '$1 $2').toUpperCase(), 90, 132);
+  pdf.text("DECORRENZA", 10, 140);
+  pdf.text(decorrenza, 90, 140);
+  pdf.text("SCADENZA", 10, 148);
+  pdf.text(scadenza, 90, 148);
+  pdf.text("VALUTA", 10, 156);
+  pdf.text("EURO", 90, 156);
+  pdf.text("CAMBIO", 10, 164);
+
+  pdf.setFillColor("#D9D9D9");
+  pdf.rect(10, 168, 190, 5, "F"); 
+  
+  pdf.setFont("Helvetica", "bold");
+  pdf.setTextColor(0, 0, 0);  
+  pdf.text("IMPORTO", 10, 172);
+  pdf.text("EURO", 90, 172);
+  pdf.text(formattaNumeroItaliano(somma), 180, 172);
+
+  // Beneficiario
+  pdf.setFont("Helvetica", "normal");
+  pdf.text("BENEFICIARIO", 10, 180);
+  pdf.text("SPENCER & CARTER SRL", 90, 180);
+  pdf.text("PAGAMENTO", 10, 188);
+  pdf.text("BONIFICO BANCARIO", 90, 188);
+  pdf.text("VALUTA/DEL", 10, 196);
+  pdf.text("FISSA", 90, 196);
+  pdf.text("BANCA DI APPOGGIO", 10, 204);
+  pdf.text("CHIANTI BANCA", 90, 204);
+  pdf.text("IBAN", 10, 212);
+  pdf.text("IT 71 O 08673 25300 000000 541426", 90, 212);
+  pdf.text("CODICE SWIFT", 10, 220);
+  pdf.text("ICRAITRRIP0", 90, 220);
+
+  pdf.setFillColor("#D9D9D9");
+  pdf.rect(10, 232, 190, 10, "F"); 
+  
+  pdf.setFont("Helvetica", "normal");
+  pdf.setTextColor(0, 0, 0);  
+  pdf.text("IL PAGAMENTO E’ STATO EFFETTUATO - SI ALLEGA RICEVUTA", 10, 236);
+
+  // Imposta font e dimensioni per la firma
+pdf.setFont("Helvetica", "normal");
+pdf.setFontSize(9);
+
+// Nuova posizione della firma (più in alto a destra)
+const firmaY = pdf.internal.pageSize.getHeight() - 45; // Più in alto
+const firmaX = pdf.internal.pageSize.getWidth() - 60; // Più a destra
+
+// Riga della firma (centrata rispetto al nome)
+const firmaTesto = "_____________________________________";
+const firmaWidth = pdf.getTextWidth(firmaTesto);
+pdf.text(firmaTesto, firmaX - (firmaWidth / 2), firmaY + 5);
+
+// Nome società o firmatario (centrato sopra la riga della firma)
+const nomeSocietaText = nomeSocieta.toUpperCase().trim();
+const nomeWidth = pdf.getTextWidth(nomeSocietaText);
+pdf.text(nomeSocietaText, firmaX - (nomeWidth / 2), firmaY);
+
+
+  // Nota esenzione da bollo
+  pdf.setFont("Helvetica", "normal");
+  pdf.setFontSize(9);
+  pdf.text("Esente da bollo - Art. 34 DPR. 601 del 29/09/1973", 10, 265);
+
+  // FOOTER
+pdf.setFontSize(8);
+pdf.setFont("Helvetica", "normal");
+const pdfWidth = pdf.internal.pageSize.getWidth(); // Larghezza della pagina
+const footerY = pdf.internal.pageSize.getHeight() - 20; // Posizione verticale del footer
+
+// PRIMO TESTO CENTRATO
+pdf.setTextColor(31, 73, 125); // Colore #1F497D (convertito in RGB)
+const title = "Spencer & Carter S.r.l.";
+const titleWidth = pdf.getTextWidth(title);
+pdf.text(title, (pdfWidth - titleWidth) / 2, footerY);
+
+// TRE COLONNE DI TESTO
+pdf.setFontSize(7);
+pdf.setTextColor(128, 128, 128); // Colore grigio per i testi
+
+// COLONNA DI SINISTRA (allineata a sinistra)
+const leftColumn = [
+  "Tel. +39 02.8089.8817 – Fax +39 02 5656 3593",
+  "RUI B n. 000671207"
+];
+leftColumn.forEach((line, index) => {
+  pdf.text(line, 10, footerY + 5 + (index * 4));
+});
+
+// COLONNA CENTRALE (allineata al centro)
+const centerColumn = [
+  "www.spencerandcarter.com",
+  "Milano – Lucca – Londra – New York"
+];
+centerColumn.forEach((line, index) => {
+  const lineWidth = pdf.getTextWidth(line);
+  pdf.text(line, (pdfWidth - lineWidth) / 2, footerY + 5 + (index * 4));
+});
+
+// COLONNA DI DESTRA (allineata a destra)
+const rightColumn = [
+  "info@spencerandcarter.com",
+  "spencerandcarter@legalmail.it"
+];
+rightColumn.forEach((line, index) => {
+  const lineWidth = pdf.getTextWidth(line);
+  pdf.text(line, pdfWidth - 10 - lineWidth, footerY + 5 + (index * 4));
+});
+
+// AGGIUNTA DEI LINK CLICCABILI PER EMAIL E SITO
+pdf.setTextColor(0, 0, 255); // Colore blu per i link
+const email1 = "info@spencerandcarter.com";
+const email2 = "spencerandcarter@legalmail.it";
+const web = "www.spencerandcarter.com";
+
+const email1Width = pdf.getTextWidth(email1);
+const email2Width = pdf.getTextWidth(email2);
+const webWidth = pdf.getTextWidth(web);
+
+pdf.link(pdfWidth - 10 - email1Width, footerY + 5, email1Width, 4, { url: `mailto:${email1}` });
+pdf.link(pdfWidth - 10 - email2Width, footerY + 9, email2Width, 4, { url: `mailto:${email2}` });
+pdf.link((pdfWidth - webWidth) / 2, footerY + 5, webWidth, 4, { url: `https://${web}` });
+
+
+  // Salva il PDF
+  const dataCorrente = new Date();
+  const annoCorrente = dataCorrente.getFullYear(); // Anno completo
+  const meseCorrente = String(dataCorrente.getMonth() + 1).padStart(2, '0'); // Mese con due cifre
+
+  const nomeFile = `${numCarico}_${nomeSocieta}_n ${annoCorrente} ${meseCorrente}-00100-10${numCarico}_del_${getDataCorrente().replaceAll('/', '-')}.pdf`;
+    pdf.save(nomeFile);
+  }
+
+
+  function scaricaCaricoRC() {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p", "mm", "a4");
+
+  // Recupera i dati dal form
+  const nomeSocieta = document.getElementById('nomeSocietaRC').value.toUpperCase();
+  const indirizzoSocieta = document.getElementById('indirizzoSocietaRC').value;
+  const cap = document.getElementById('capRC').value;
+  const citta = document.getElementById('cittaRC').value;
+  const provincia = document.getElementById('provinciaRC').value;
+  const pivaSocieta = document.getElementById('pivaSocietaRC').value;
+  const numCarico = document.getElementById('numCaricoRC').value;
+  const decorrenza = formattaDataItaliana(document.getElementById('decorrenzaRC').value);
+  const scadenza = formattaDataItaliana(document.getElementById('scadenzaRC').value);
+  const tipoPolizza = "RC";
+  const importoRC = parseFloat(document.getElementById('importoRC').value) || 0;
+  const somma = importoRC.toFixed(2);
+  
+  function getDataCorrente() {
+    const oggi = new Date();
+    const giorno = String(oggi.getDate()).padStart(2, '0');
+    const mese = String(oggi.getMonth() + 1).padStart(2, '0');
+    const anno = oggi.getFullYear(); // Anno completo
+    return `${giorno}.${mese}.${anno}`;
+}
+
+// 📌 INSERISCI QUI LA FUNZIONE formattaDataItaliana()
+function formattaDataItaliana(dataInput) {
+  if (!dataInput) return "";
+  const tipoPolizza = "RC";
+
+  const parts = dataInput.split('-');
+  if (parts.length === 3) {
+    // Formato YYYY-MM-DD
+    return `${parts[2]}.${parts[1]}.${parts[0]}`;
+  } else if (parts.length === 2 && tipoPolizza === "nuovaAdesione") {
+    // Formato YYYY-MM per nuova adesione
+    return `00.${parts[1]}.${parts[0]}`;
+  }
+
+  return dataInput;
+}
+
+
+
+
+
+  // Funzione per ottenere l'orario corrente
+  function getOraCorrente() {
+    const ora = new Date();
+    return `${String(ora.getHours()).padStart(2, '0')}:${String(ora.getMinutes()).padStart(2, '0')}`;
+  }
+
+  // Funzione per convertire le date di input nel formato DD/MM/YY
+  function formattaData(dataInput) {
+    if (!dataInput) return "";
+    const parts = dataInput.split('-'); // Supponendo che l'input sia in formato YYYY-MM-DD
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0].slice(-2)}`;
+    }
+    return dataInput; // Se il formato è già corretto, restituisce invariato
+  }
+
+  // Imposta font e dimensioni
+  pdf.setFont("Helvetica", "normal");
+  pdf.setFontSize(9);
+
+  // Aggiungi logo mantenendo proporzioni
+  const logoPath = "img/s&c_LOGO_BROKER.png";
+  const originalWidth = 7250; // Larghezza originale del logo
+  const originalHeight = 1366; // Altezza originale del logo
+  const scaleFactor = 0.01; // Fattore di scala per adattare al PDF
+  const logoWidth = originalWidth * scaleFactor; // Larghezza ridimensionata
+  const logoHeight = originalHeight * scaleFactor; // Altezza ridimensionata
+
+  // Calcola posizione centrata per il logo
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const logoX = (pageWidth - logoWidth) / 2; // Centrare orizzontalmente
+  const logoY = 10; // Posizione dall'alto
+  pdf.addImage(logoPath, "PNG", logoX, logoY, logoWidth, logoHeight);
+
+  // Testo intestazione
+  pdf.text(`Milano ${getDataCorrente()}`, 10, 40);
+  pdf.text(`time: ${getOraCorrente()}`, 190, 40, null, null, "right");
+
+  // Striscia grigia sotto il titolo
+pdf.setFillColor("#D9D9D9");
+pdf.rect(10, 46, 190, 5, "F");  // Rettangolo pieno (disegnato prima)
+
+// Titolo Carico Contabile sopra la striscia
+pdf.setFont("Helvetica", "bold");
+pdf.setTextColor(0, 0, 0);  // Testo nero
+pdf.text("CARICO CONTABILE N.", 10, 50);
+pdf.setFont("Helvetica", "bold");
+const dataOggi = new Date();
+const annoShort = dataOggi.getFullYear();
+const meseShort = String(dataOggi.getMonth() + 1).padStart(2, '0'); // Mese con due cifre
+
+const numeroFormatoPDF = `${annoShort} ${meseShort}-00100-10${numCarico}`;
+
+pdf.text(numeroFormatoPDF, 90, 50);
+
+pdf.text(numCarico, 180, 50, null, null, "right");
+
+
+  // Dati contraente
+  pdf.setFont("Helvetica", "normal");
+  pdf.text("CONTRAENTE", 10, 60);
+  pdf.text(nomeSocieta, 90, 60);
+  pdf.text("INDIRIZZO", 10, 68);
+  pdf.text(indirizzoSocieta, 90, 68);
+  pdf.text("C.A.P./CITTA'", 10, 76);
+  pdf.text(`${cap} ${citta}`, 90, 76);
+  pdf.text("PROVINCIA/NAZIONE", 10, 84);
+  pdf.text(provincia, 90, 84);
+  pdf.text("C.F./P. IVA", 10, 92);
+  pdf.text(pivaSocieta, 90, 92);
+  pdf.text("RISCHIO", 10, 100);
+  pdf.text("RC PROFESSIONALE", 90, 100);
+  pdf.text("COD./FRAZIONAMENTO", 10, 108);
+  pdf.text("01/ANNUALE", 90, 108);
+  pdf.text("EMITTENTE", 10, 116);
+  pdf.text("ACCELERANT", 90, 116);
+  pdf.text("DIPENDENZA", 10, 124);
+  pdf.text("OMNYY", 90, 124);
+  pdf.text("POLIZZA", 10, 132);
+  pdf.text("EMITTENDA", 90, 132);
+  pdf.text("DECORRENZA", 10, 140);
+  pdf.text(decorrenza, 90, 140);
+  pdf.text("SCADENZA", 10, 148);
+  pdf.text(scadenza, 90, 148);
+  pdf.text("VALUTA", 10, 156);
+  pdf.text("EURO", 90, 156);
+  pdf.text("CAMBIO", 10, 164);
+
+  pdf.setFillColor("#D9D9D9");
+  pdf.rect(10, 168, 190, 5, "F"); 
+  
+  pdf.setFont("Helvetica", "bold");
+  pdf.setTextColor(0, 0, 0);  
+  pdf.text("IMPORTO", 10, 172);
+  pdf.text("EURO", 90, 172);
+  pdf.text(formattaNumeroItaliano(importoRC), 180, 172);
+
+  // Beneficiario
+  pdf.setFont("Helvetica", "normal");
+  pdf.text("BENEFICIARIO", 10, 180);
+  pdf.text("SPENCER & CARTER SRL", 90, 180);
+  pdf.text("PAGAMENTO", 10, 188);
+  pdf.text("BONIFICO BANCARIO", 90, 188);
+  pdf.text("VALUTA/DEL", 10, 196);
+  pdf.text("FISSA", 90, 196);
+  pdf.text("BANCA DI APPOGGIO", 10, 204);
+  pdf.text("CHIANTI BANCA", 90, 204);
+  pdf.text("IBAN", 10, 212);
+  pdf.text("IT 48 P 08673 25300 000000 541427", 90, 212);
+  pdf.text("CODICE SWIFT", 10, 220);
+  pdf.text("ICRAITRRIP0", 90, 220);
+
+  pdf.setFillColor("#D9D9D9");
+  pdf.rect(10, 232, 190, 10, "F"); 
+  
+  pdf.setFont("Helvetica", "normal");
+  pdf.setTextColor(0, 0, 0);  
+  pdf.text("IL PAGAMENTO E’ STATO EFFETTUATO - SI ALLEGA RICEVUTA", 10, 236);
+
+  // Imposta font e dimensioni per la firma
+pdf.setFont("Helvetica", "normal");
+pdf.setFontSize(9);
+
+// Nuova posizione della firma (più in alto a destra)
+const firmaY = pdf.internal.pageSize.getHeight() - 45; // Più in alto
+const firmaX = pdf.internal.pageSize.getWidth() - 60; // Più a destra
+
+// Riga della firma (centrata rispetto al nome)
+const firmaTesto = "_____________________________________";
+const firmaWidth = pdf.getTextWidth(firmaTesto);
+pdf.text(firmaTesto, firmaX - (firmaWidth / 2), firmaY + 5);
+
+// Nome società o firmatario (centrato sopra la riga della firma)
+const nomeSocietaText = nomeSocieta.toUpperCase().trim();
+const nomeWidth = pdf.getTextWidth(nomeSocietaText);
+pdf.text(nomeSocietaText, firmaX - (nomeWidth / 2), firmaY);
+
+
+  // Nota esenzione da bollo
+  pdf.setFont("Helvetica", "normal");
+  pdf.setFontSize(9);
+  pdf.text("Esente da bollo - Art. 34 DPR. 601 del 29/09/1973", 10, 265);
+
+  // FOOTER
+pdf.setFontSize(8);
+pdf.setFont("Helvetica", "normal");
+const pdfWidth = pdf.internal.pageSize.getWidth(); // Larghezza della pagina
+const footerY = pdf.internal.pageSize.getHeight() - 20; // Posizione verticale del footer
+
+// PRIMO TESTO CENTRATO
+pdf.setTextColor(31, 73, 125); // Colore #1F497D (convertito in RGB)
+const title = "Spencer & Carter S.r.l.";
+const titleWidth = pdf.getTextWidth(title);
+pdf.text(title, (pdfWidth - titleWidth) / 2, footerY);
+
+// TRE COLONNE DI TESTO
+pdf.setFontSize(7);
+pdf.setTextColor(128, 128, 128); // Colore grigio per i testi
+
+// COLONNA DI SINISTRA (allineata a sinistra)
+const leftColumn = [
+  "Tel. +39 02.8089.8817 – Fax +39 02 5656 3593",
+  "RUI B n. 000671207"
+];
+leftColumn.forEach((line, index) => {
+  pdf.text(line, 10, footerY + 5 + (index * 4));
+});
+
+// COLONNA CENTRALE (allineata al centro)
+const centerColumn = [
+  "www.spencerandcarter.com",
+  "Milano – Lucca – Londra – New York"
+];
+centerColumn.forEach((line, index) => {
+  const lineWidth = pdf.getTextWidth(line);
+  pdf.text(line, (pdfWidth - lineWidth) / 2, footerY + 5 + (index * 4));
+});
+
+// COLONNA DI DESTRA (allineata a destra)
+const rightColumn = [
+  "info@spencerandcarter.com",
+  "spencerandcarter@legalmail.it"
+];
+rightColumn.forEach((line, index) => {
+  const lineWidth = pdf.getTextWidth(line);
+  pdf.text(line, pdfWidth - 10 - lineWidth, footerY + 5 + (index * 4));
+});
+
+// AGGIUNTA DEI LINK CLICCABILI PER EMAIL E SITO
+pdf.setTextColor(0, 0, 255); // Colore blu per i link
+const email1 = "info@spencerandcarter.com";
+const email2 = "spencerandcarter@legalmail.it";
+const web = "www.spencerandcarter.com";
+
+const email1Width = pdf.getTextWidth(email1);
+const email2Width = pdf.getTextWidth(email2);
+const webWidth = pdf.getTextWidth(web);
+
+pdf.link(pdfWidth - 10 - email1Width, footerY + 5, email1Width, 4, { url: `mailto:${email1}` });
+pdf.link(pdfWidth - 10 - email2Width, footerY + 9, email2Width, 4, { url: `mailto:${email2}` });
+pdf.link((pdfWidth - webWidth) / 2, footerY + 5, webWidth, 4, { url: `https://${web}` });
+
+
+  // Salva il PDF
+  const dataCorrente = new Date();
+  const annoCorrente = dataCorrente.getFullYear(); // Anno completo
+  const meseCorrente = String(dataCorrente.getMonth() + 1).padStart(2, '0'); // Mese con due cifre
+
+  const nomeFile = `${numCarico} ${nomeSocieta} n ${annoCorrente} ${meseCorrente}-00100-10${numCarico} del ${getDataCorrente().replace(/\./g, " ")} RC.pdf`;
+    pdf.save(nomeFile);
+  }
+
+  function scaricaCertificato() {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p", "mm", "a4");
+
+  // Dati dal form
+  const nomeSocieta = document.getElementById("nomeSocietaCertificato").value.toUpperCase();
+  const capLegale = document.getElementById("capLegale").value;
+  const cittaLegale = document.getElementById("cittaLegale").value;
+  const provinciaLegale = document.getElementById("provinciaLegale").value;
+  const viaLegale = document.getElementById("viaLegale").value;
+  const numeroLegale = document.getElementById("numeroLegale").value;
+
+  const indirizzoLegale = `${viaLegale} ${numeroLegale} - ${capLegale} ${cittaLegale} (${provinciaLegale})`;
+
+  const indirizzoOperativa = document.getElementById("indirizzoOperativaCertificato").value;
+  const piva = document.getElementById("pivaSocietaCertificato").value;
+  const marchio = document.getElementById("marchioCommercialeCertificato").value;
+  const decorrenzaInput = document.getElementById("decorrenzaCertificato").value;
+  const scadenzaInput = document.getElementById("scadenzaCertificato").value;
+
+  const limitazioneRimborso = document.getElementById("limitazioneRimborso").value;
+  const importoLimitazione = document.getElementById("importoLimitazioneRimborso").value; // non stampato
+
+  // Validazione: se SI serve l'importo (anche se non viene stampato nel PDF)
+  if (limitazioneRimborso === "SI" && (!importoLimitazione || Number(importoLimitazione) <= 0)) {
+    alert("Inserisci l'importo per la Limitazione rimborso.");
+    return;
+  }
+
+  // Aggiunta logo
+  const logoPath = "img/logodelibera.jpg";
+    const logoWidth = 60; // Larghezza del logo
+    const logoHeight = 20; // Altezza del logo
+    const logoX = (pdf.internal.pageSize.getWidth() - logoWidth) / 2; // Centrare il logo orizzontalmente
+    const logoY = 8; // Distanza dalla parte superiore
+    pdf.addImage(logoPath, "JPEG", logoX, logoY, logoWidth, logoHeight);
+
+  // Data corrente
+  const oggi = new Date();
+  const giorno = String(oggi.getDate()).padStart(2, '0');
+  const mese = String(oggi.getMonth() + 1).padStart(2, '0');
+  const anno = oggi.getFullYear();
+  const numeroCertificato = document.getElementById("numeroCertificato").value.padStart(4, '0');
+  const codiceCertificato = `${anno}${mese}${numeroCertificato}AT`;
+
+
+  const mesi = ["GENNAIO", "FEBBRAIO", "MARZO", "APRILE", "MAGGIO", "GIUGNO", "LUGLIO", "AGOSTO", "SETTEMBRE", "OTTOBRE", "NOVEMBRE", "DICEMBRE"];
+
+  function formattaData(dataStr) {
+    if (!dataStr) return "";
+    const d = new Date(dataStr);
+    return `${String(d.getDate()).padStart(2, '0')} ${mesi[d.getMonth()]} ${d.getFullYear()}`;
+  }
+
+  const decorrenza = formattaData(decorrenzaInput);
+  const scadenza = formattaData(scadenzaInput);
+  const dataEmissione = formattaData(oggi);
+
+  // TITOLO CENTRALE
+  pdf.setFont("Helvetica", "bold");
+  pdf.setFontSize(16);
+  pdf.text("FONDO CONSORTILE DI GARANZIA", 105, 36, null, null, "center");
+
+  // Certificato N
+  pdf.setFontSize(11);
+  pdf.text(`CERTIFICATO N. ${codiceCertificato}`, 15, 48);
+
+  // Corpo testo principale
+  pdf.setFont("Helvetica", "normal");
+  pdf.setFontSize(11);
+  let y = 58;
+  pdf.text(`Il presente certificato attesta che ${nomeSocieta}`, 15, y);
+  y += 4;
+  pdf.text(`Sede Legale in ${indirizzoLegale}`, 15, y);
+  y += 4;
+  if (indirizzoOperativa.trim() !== "") {
+  pdf.text(`Sede Operativa in ${indirizzoOperativa}`, 15, y);
+  y += 4;
+  }
+
+  pdf.text(`Partita IVA ${piva}`, 15, y);
+  y += 4;
+  pdf.text(`Marchio commerciale ${marchio}`, 15, y);
+
+  y += 7;
+  pdf.setFont("Helvetica", "normal");
+  pdf.setFontSize(11);
+  pdf.text("ADERISCE", 105, y, null, null, "center"); // centrato
+
+  y += 7;
+  pdf.setFont("Helvetica", "normal");
+  const blocco = "Al Fondo di Garanzia consortile VACANZE GARANTITE® costituito dal consorzio interno VACANZE GARANTITE® sulla base di quanto stabilito D.Lgs. n. 62 del 21 maggio 2018 – Sezione V - Protezione in caso di insolvenza o fallimento – Art. 47 comma 3.";
+pdf.text(blocco, 15, y, { maxWidth: 180, align: "justify" });
+
+y += 15; // Avanza alla prossima sezione
+
+  y += 12;
+  // Decorrenza e Scadenza in colonna
+  pdf.setFont("Helvetica", "normal");
+  pdf.text("Decorrenza", 15, y);
+  pdf.text("Scadenza", 150, y);
+
+  y += 5;
+  pdf.setFont("Helvetica", "normal");
+  pdf.text(decorrenza, 15, y);
+  pdf.text(scadenza, 150, y);
+
+  y += 15;
+
+  pdf.setFont("Helvetica", "normal");
+pdf.setFontSize(11);
+
+// Paragrafo 1
+const par1 = "Il Fondo Consortile VACANZE GARANTITE® dichiara che il presente documento è rilasciato sulla base di quanto disposto dal DECRETO LEGISLATIVO 21 maggio 2018, n. 62 - Attuazione della direttiva (UE) 2015/2302 del Parlamento europeo e del Consiglio, del 25 novembre 2015, relativa ai pacchetti turistici e ai servizi turistici collegati, che modifica il regolamento (CE) n. 2006/2004 e la direttiva 2011/83/UE del Parlamento europeo e del Consiglio e che abroga la direttiva 90/314/CEE del Consiglio. – Sezione V – Protezione in caso di insolvenza o fallimento - Art. 47 comma 3.";
+pdf.text(par1, 15, y, { maxWidth: 180, align: "justify" });
+y += 33;
+
+// Paragrafo 2
+const par2 = "Il Consorzio interno oggetto della dichiarazione ha sottoposto a controllo le sue attività e soddisfa i requisiti previsti dalle Leggi citate.";
+pdf.text(par2, 15, y, { maxWidth: 180, align: "justify" });
+y += 15;
+
+// Parte 1: testo giustificato fino a "pubblicato sul sito internet"
+// Paragrafo con link integrato e giustificato in una riga unica (se possibile)
+const fullText = "L’attestazione resta valida finché la Società garantita rispetta le normative e quanto prescritto dalle Leggi italiane e dal Regolamento del Consorzio Interno VACANZE GARANTITE® pubblicato sul sito internet www.vacanzegarantite.it e il cui contenuto deve intendersi qui integralmente richiamato.";
+
+// Spezza il testo in righe per larghezza massima, lasciando spazio sufficiente per la giustificazione
+const righe = pdf.splitTextToSize(fullText, 180);
+
+righe.forEach((riga, idx) => {
+  // Colora il link solo se è nella riga corrente
+  if (riga.includes("www.vacanzegarantite.it")) {
+    const parts = riga.split("www.vacanzegarantite.it");
+    let x = 15;
+
+    // Parte prima del link
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(parts[0], x, y, { align: "justify", maxWidth: 180 });
+    x += pdf.getTextWidth(parts[0]);
+
+    // Link blu
+    pdf.setTextColor(0, 0, 255);
+    pdf.text("www.vacanzegarantite.it", x, y);
+    x += pdf.getTextWidth("www.vacanzegarantite.it");
+
+    // Parte dopo il link
+    pdf.setTextColor(0, 0, 0);
+    if (parts[1].trim()) {
+      pdf.text(parts[1], x, y);
+    }
+  } else {
+    // Riga normale
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(riga, 15, y, { align: "justify", maxWidth: 180 });
+  }
+  y += 5;
+});
+
+y+=5;
+
+
+
+
+
+
+
+
+
+
+
+// Paragrafo 4
+const par4 = "La documentazione relativa alla presente attestazione è conservata presso gli uffici del Consorzio interno VACANZE GARANTITE®.";
+pdf.text(par4, 15, y, { maxWidth: 180, align: "justify" });
+y += 20;
+
+// Firma
+pdf.setFont("Helvetica", "normal");
+pdf.text(`Milano, ${dataEmissione}`, 15, y);
+pdf.setFont("Helvetica", "normal");
+pdf.text("Fondo consortile VACANZE GARANTITE®", 140, y, null, null, "center");
+
+y += 5;
+pdf.text("Il Vice Presidente", 140, y, null, null, "center");
+y += 5;
+pdf.text("Sandra Bianchini", 140, y, null, null, "center");
+
+// Spazio sotto la firma
+y += 26;
+
+// Footer disclaimer (solo se Limitazione rimborso = SI)
+if (limitazioneRimborso === "SI") {
+  // importoLimitazione arriva dal form come stringa
+  const importoRaw = document.getElementById("importoLimitazioneRimborso").value;
+
+  // Normalizza l'importo supportando:
+  // - formato IT: "20.000,50" / "24,50"
+  // - formato EN: "20000.50" / "24.50"
+  function parseImporto(val) {
+    if (val === null || val === undefined) return NaN;
+    let s = String(val).trim().replace(/\s+/g, "");
+    if (!s) return NaN;
+
+    const hasComma = s.includes(",");
+    const hasDot = s.includes(".");
+
+    if (hasComma && hasDot) {
+      // IT classico: punti migliaia + virgola decimale
+      s = s.replace(/\./g, "").replace(",", ".");
+    } else if (hasComma) {
+      // Solo virgola: virgola decimale, rimuovo eventuali punti migliaia
+      s = s.replace(/\./g, "").replace(",", ".");
+    } else if (hasDot) {
+      // Solo punto: può essere decimale (24.50) o migliaia (20.000)
+      const dotCount = (s.match(/\./g) || []).length;
+      if (dotCount > 1) {
+        // Più punti = quasi sicuramente separatori migliaia
+        s = s.replace(/\./g, "");
+      } else {
+        const parts = s.split(".");
+        const decPart = parts[1] || "";
+        // Se 3 cifre dopo il punto, probabilmente è separatore migliaia (es. 20.000)
+        if (decPart.length === 3) s = parts.join("");
+        // altrimenti è decimale e lo lasciamo com'è (es. 24.50)
+      }
+    }
+    return parseFloat(s);
+  }
+
+  const importoNum = parseImporto(importoRaw);
+  if (isNaN(importoNum) || importoNum <= 0) {
+    alert("Inserisci un importo valido per la Limitazione rimborso.");
+    return;
+  }
+
+  // Formatta in stile italiano (senza simbolo €)
+  const importoFormattato = importoNum
+    .toFixed(2)
+    .replace(".", ",")
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+  // In lettere: per importi interi rimuoviamo "/00"
+  let importoLettere = "";
+  if (!isNaN(importoNum) && importoNum > 0) {
+    importoLettere = convertiInParole(importoNum).replace(/\/00$/, "");
+  }
+
+  const disclaimer = `Nel rispetto delle modalità di ammissione alla garanzia prestata dal Fondo Consortile VACANZE GARANTITE e della forma di contribuzione prescelta, la garanzia rilasciata a favore dei Viaggiatori/Turisti opera fino alla scadenza del presente certificato. La garanzia è prestata fino alla concorrenza massima di Euro ${importoFormattato}${importoLettere ? " (" + importoLettere + ")" : ""} per tutto il periodo di validità del certificato, calcolata congruamente in relazione ai dati dichiarati.`;
+
+  pdf.setFontSize(8);
+  pdf.setFont("Helvetica", "normal");
+
+  // IMPORTANTE: per evitare PDF "corrotti" su alcuni visualizzatori,
+  // NON stampiamo righe singole con opzioni di allineamento/justify.
+  // Usiamo splitTextToSize + pdf.text(array) che genera output più compatibile.
+  const maxTextWidth = pdf.internal.pageSize.getWidth() - 30; // 15mm margini
+  const righeDisclaimer = pdf.splitTextToSize(disclaimer, maxTextWidth);
+
+  // Manteniamo il testo nel margine basso, senza sforare il footer.
+  const disclaimerStartY = Math.min(y, 255);
+  pdf.text(righeDisclaimer, 15, disclaimerStartY);
+}
+
+// Footer finale
+y = 285;
+pdf.setFont("Helvetica", "bold");
+pdf.setFontSize(8);
+pdf.setTextColor(128, 128, 128); // grigio
+pdf.text("Consorzio Vacanze Garantite", 105, y, null, null, "center");
+
+y += 4;
+pdf.setFont("Helvetica", "normal");
+pdf.setFontSize(8);
+pdf.text("Via Enrico Cosenz 54/B – 20158 Milano - P.Iva 11619990960", 105, y, null, null, "center");
+
+y += 4;
+pdf.setTextColor(0, 0, 255); // blu per i link
+pdf.text("info@vacanzegarantite.it - www.vacanzegarantite.it", 105, y, null, null, "center");
+
+// Ripristina colore nero se necessario dopo
+pdf.setTextColor(0, 0, 0);
+
+
+  // Salvataggio
+  const dataEmissioneNome = `${giorno} ${mese} ${anno}`;
+  const nomeFile = `N ${codiceCertificato} ${nomeSocieta} del ${dataEmissioneNome}.pdf`;
+
+  pdf.save(nomeFile);
+}
+
+
+
+    function convertiInParole(numero) {
+  const numeriUnita = [
+    "zero", "uno", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove"
+  ];
+  const numeriDieci = [
+    "dieci", "undici", "dodici", "tredici", "quattordici", "quindici", "sedici", "diciassette", "diciotto", "diciannove"
+  ];
+  const decine = [
+    "", "", "venti", "trenta", "quaranta", "cinquanta", "sessanta", "settanta", "ottanta", "novanta"
+  ];
+
+  function numToWords(n) {
+    if (n < 10) return numeriUnita[n];
+    if (n < 20) return numeriDieci[n - 10];
+    if (n < 100) {
+      let parola = decine[Math.floor(n / 10)];
+      if (n % 10 === 1 || n % 10 === 8) parola = parola.slice(0, -1); // Elisione per "uno" e "otto"
+      return parola + (n % 10 !== 0 ? numeriUnita[n % 10] : "");
+    }
+    if (n < 1000) {
+      if (n === 100) return "cento";
+      let parola = "cento";
+      if (Math.floor((n % 100) / 10) === 8) parola = "cent"; // Elisione per "ottanta"
+      return numeriUnita[Math.floor(n / 100)] + parola + (n % 100 !== 0 ? numToWords(n % 100) : "");
+    }
+    if (n < 1000000) {
+      const migliaia = Math.floor(n / 1000);
+      const resto = n % 1000;
+      const parolaMigliaia = migliaia === 1 ? "mille" : numToWords(migliaia) + "mila";
+      return parolaMigliaia + (resto !== 0 ? numToWords(resto) : "");
+    }
+    if (n < 1000000000) {
+      const milioni = Math.floor(n / 1000000);
+      const resto = n % 1000000;
+      const parolaMilioni = milioni === 1 ? "unmilione" : numToWords(milioni) + "milioni";
+      return parolaMilioni + (resto !== 0 ? numToWords(resto) : "");
+    }
+    return "numero troppo grande";
+  }
+
+  const parteIntera = Math.floor(numero);
+  const parteDecimale = Math.round((numero - parteIntera) * 100);
+
+  let risultato = numToWords(parteIntera);
+
+  if (parteDecimale > 0) {
+    risultato += `/${numToWords(parteDecimale)}`;
+  } else {
+    risultato += "/00"; // Aggiungi /00 se non ci sono decimali
+  }
+  return risultato;
+}
+
+function toggleDecorrenza() {
+    const tipoPolizza = document.getElementById('tipoPolizza').value;
+    const inputDecorrenza = document.getElementById('decorrenza');
+    const inputScadenza = document.getElementById('scadenza');
+
+    if (tipoPolizza === 'nuovaAdesione') {
+        inputDecorrenza.type = 'month';
+        inputScadenza.type = 'month';
+    } else {
+        inputDecorrenza.type = 'date';
+        inputScadenza.type = 'date';
+    }
+}
+
+function calcolaPercentuale() {
+  const importo = parseFloat(document.getElementById("amount").value);
+  const percentuale = parseFloat(document.getElementById("percentage").value);
+
+  if (isNaN(importo) || isNaN(percentuale)) {
+    document.getElementById("risultato").innerText = "Inserisci valori validi.";
+    return;
+  }
+
+  const risultato = (importo * percentuale) / 100;
+  document.getElementById("risultato").innerText = `Risultato: ${percentuale}% di €${importo} è €${risultato.toFixed(2)}`;
+}
+
+  </script>
+</body>
+</html>
