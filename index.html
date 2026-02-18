@@ -1351,46 +1351,47 @@ pdf.text("Sandra Bianchini", 140, y, null, null, "center");
 // Spazio sotto la firma
 y += 26;
 
-// Footer disclaimer (sempre presente: testo diverso se SI/NO)
+// ===== DISCLAMER FINALE (sempre, cambia testo) =====
 let disclaimer = "";
 
 if (limitazioneRimborso === "SI") {
-  // importoLimitazione arriva dal form come stringa
-  const importoRaw = String(importoLimitazione || "");
+  // importoLimitazione dal form (stringa). Supporta "24,50" e "1.234,50"
+  const raw = String(importoLimitazione || "").trim();
+  const pulito = raw.replace(/\./g, "").replace(",", ".");
+  const num = parseFloat(pulito);
 
-  // Normalizza formato italiano:
-  // - toglie punti delle migliaia
-  // - trasforma virgola in punto
-  let importoPulito = importoRaw.replace(/\./g, "").replace(",", ".");
-  const importoNum = parseFloat(importoPulito);
-
-  if (isNaN(importoNum) || importoNum <= 0) {
+  if (isNaN(num) || num <= 0) {
     alert("Inserisci un importo valido per la limitazione.");
     return;
   }
 
-  // Formatta in stile italiano SENZA simbolo €
-  const importoFormattato = importoNum
+  // Formato italiano SENZA simbolo €
+  const importoFormattato = num
     .toFixed(2)
     .replace(".", ",")
     .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
-  disclaimer = `Nel rispetto delle modalità di ammissione alla garanzia prestata dal Fondo Consortile VACANZE GARANTITE e della forma di contribuzione prescelta, la garanzia rilasciata a favore dei Viaggiatori/Turisti opera fino alla scadenza del presente certificato. La garanzia è prestata fino alla concorrenza massima di Euro ${importoFormattato} per tutto il periodo di validità del certificato, calcolata congruamente in relazione ai dati dichiarati.`;
+  disclaimer =
+    `Nel rispetto delle modalità di ammissione alla garanzia prestata dal Fondo Consortile VACANZE GARANTITE e della forma di contribuzione prescelta, ` +
+    `la garanzia rilasciata a favore dei Viaggiatori/Turisti opera fino alla scadenza del presente certificato. ` +
+    `La garanzia è prestata fino alla concorrenza massima di Euro ${importoFormattato} per tutto il periodo di validità del certificato, ` +
+    `calcolata congruamente in relazione ai dati dichiarati.`;
 } else {
-  // Frase quando Limitazione rimborso = NO
-  disclaimer = `Nel rispetto delle modalità di ammissione alla garanzia prestata dal Fondo Consortile VACANZE GARANTITE e della forma di contribuzione prescelta, la garanzia rilasciata a favore dei Viaggiatori/Turisti opera fino alla scadenza del presente certificato`;
+  disclaimer =
+    `Nel rispetto delle modalità di ammissione alla garanzia prestata dal Fondo Consortile VACANZE GARANTITE e della forma di contribuzione prescelta, ` +
+    `la garanzia rilasciata a favore dei Viaggiatori/Turisti opera fino alla scadenza del presente certificato.`;
 }
 
 pdf.setFontSize(8);
 pdf.setFont("Helvetica", "normal");
+pdf.setTextColor(0, 0, 0);
 
-// Output compatibile: splitTextToSize + pdf.text(array)
 const maxTextWidth = pdf.internal.pageSize.getWidth() - 30; // margini 15mm
 const righeDisclaimer = pdf.splitTextToSize(disclaimer, maxTextWidth);
 
-// Manteniamo il testo nel margine basso, senza sforare il footer.
-const disclaimerStartY = Math.min(y, 260);
-pdf.text(righeDisclaimer, 15, disclaimerStartY);
+// Posizione fissa in basso (sopra il footer), così non sparisce mai
+const disclaimerY = 255;
+pdf.text(righeDisclaimer, 15, disclaimerY);
 
 // Footer finale
 y = 285;
