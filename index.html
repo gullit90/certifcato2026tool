@@ -1351,78 +1351,46 @@ pdf.text("Sandra Bianchini", 140, y, null, null, "center");
 // Spazio sotto la firma
 y += 26;
 
-// Footer disclaimer (solo se Limitazione rimborso = SI)
+// Footer disclaimer (sempre presente: testo diverso se SI/NO)
+let disclaimer = "";
+
 if (limitazioneRimborso === "SI") {
   // importoLimitazione arriva dal form come stringa
-  const importoRaw = document.getElementById("importoLimitazioneRimborso").value;
+  const importoRaw = String(importoLimitazione || "");
 
-  // Normalizza l'importo supportando:
-  // - formato IT: "20.000,50" / "24,50"
-  // - formato EN: "20000.50" / "24.50"
-  function parseImporto(val) {
-    if (val === null || val === undefined) return NaN;
-    let s = String(val).trim().replace(/\s+/g, "");
-    if (!s) return NaN;
+  // Normalizza formato italiano:
+  // - toglie punti delle migliaia
+  // - trasforma virgola in punto
+  let importoPulito = importoRaw.replace(/\./g, "").replace(",", ".");
+  const importoNum = parseFloat(importoPulito);
 
-    const hasComma = s.includes(",");
-    const hasDot = s.includes(".");
-
-    if (hasComma && hasDot) {
-      // IT classico: punti migliaia + virgola decimale
-      s = s.replace(/\./g, "").replace(",", ".");
-    } else if (hasComma) {
-      // Solo virgola: virgola decimale, rimuovo eventuali punti migliaia
-      s = s.replace(/\./g, "").replace(",", ".");
-    } else if (hasDot) {
-      // Solo punto: può essere decimale (24.50) o migliaia (20.000)
-      const dotCount = (s.match(/\./g) || []).length;
-      if (dotCount > 1) {
-        // Più punti = quasi sicuramente separatori migliaia
-        s = s.replace(/\./g, "");
-      } else {
-        const parts = s.split(".");
-        const decPart = parts[1] || "";
-        // Se 3 cifre dopo il punto, probabilmente è separatore migliaia (es. 20.000)
-        if (decPart.length === 3) s = parts.join("");
-        // altrimenti è decimale e lo lasciamo com'è (es. 24.50)
-      }
-    }
-    return parseFloat(s);
-  }
-
-  const importoNum = parseImporto(importoRaw);
   if (isNaN(importoNum) || importoNum <= 0) {
-    alert("Inserisci un importo valido per la Limitazione rimborso.");
+    alert("Inserisci un importo valido per la limitazione.");
     return;
   }
 
-  // Formatta in stile italiano (senza simbolo €)
+  // Formatta in stile italiano SENZA simbolo €
   const importoFormattato = importoNum
     .toFixed(2)
     .replace(".", ",")
     .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
-  // In lettere: per importi interi rimuoviamo "/00"
-  let importoLettere = "";
-  if (!isNaN(importoNum) && importoNum > 0) {
-    importoLettere = convertiInParole(importoNum).replace(/\/00$/, "");
-  }
-
-  const disclaimer = `Nel rispetto delle modalità di ammissione alla garanzia prestata dal Fondo Consortile VACANZE GARANTITE e della forma di contribuzione prescelta, la garanzia rilasciata a favore dei Viaggiatori/Turisti opera fino alla scadenza del presente certificato. La garanzia è prestata fino alla concorrenza massima di Euro ${importoFormattato}${importoLettere ? " (" + importoLettere + ")" : ""} per tutto il periodo di validità del certificato, calcolata congruamente in relazione ai dati dichiarati.`;
-
-  pdf.setFontSize(8);
-  pdf.setFont("Helvetica", "normal");
-
-  // IMPORTANTE: per evitare PDF "corrotti" su alcuni visualizzatori,
-  // NON stampiamo righe singole con opzioni di allineamento/justify.
-  // Usiamo splitTextToSize + pdf.text(array) che genera output più compatibile.
-  const maxTextWidth = pdf.internal.pageSize.getWidth() - 30; // 15mm margini
-  const righeDisclaimer = pdf.splitTextToSize(disclaimer, maxTextWidth);
-
-  // Manteniamo il testo nel margine basso, senza sforare il footer.
-  const disclaimerStartY = Math.min(y, 255);
-  pdf.text(righeDisclaimer, 15, disclaimerStartY);
+  disclaimer = `Nel rispetto delle modalità di ammissione alla garanzia prestata dal Fondo Consortile VACANZE GARANTITE e della forma di contribuzione prescelta, la garanzia rilasciata a favore dei Viaggiatori/Turisti opera fino alla scadenza del presente certificato. La garanzia è prestata fino alla concorrenza massima di Euro ${importoFormattato} per tutto il periodo di validità del certificato, calcolata congruamente in relazione ai dati dichiarati.`;
+} else {
+  // Frase quando Limitazione rimborso = NO
+  disclaimer = `Nel rispetto delle modalità di ammissione alla garanzia prestata dal Fondo Consortile VACANZE GARANTITE e della forma di contribuzione prescelta, la garanzia rilasciata a favore dei Viaggiatori/Turisti opera fino alla scadenza del presente certificato`;
 }
+
+pdf.setFontSize(8);
+pdf.setFont("Helvetica", "normal");
+
+// Output compatibile: splitTextToSize + pdf.text(array)
+const maxTextWidth = pdf.internal.pageSize.getWidth() - 30; // margini 15mm
+const righeDisclaimer = pdf.splitTextToSize(disclaimer, maxTextWidth);
+
+// Manteniamo il testo nel margine basso, senza sforare il footer.
+const disclaimerStartY = Math.min(y, 260);
+pdf.text(righeDisclaimer, 15, disclaimerStartY);
 
 // Footer finale
 y = 285;
